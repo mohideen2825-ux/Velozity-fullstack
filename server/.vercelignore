@@ -1,0 +1,11 @@
+node_modules
+dist
+.env.example
+README.md
+*.log
+.git
+.gitignore
+.DS_Store
+prisma/migrations
+prisma/dev.db
+prisma/dev.db-journal

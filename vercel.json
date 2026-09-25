@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/package.json",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-builds",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server/src/index.ts"
+    },
+    {
+      "src": "/.*",
+      "dest": "client/dist/index.html"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@DATABASE_URL",
+    "JWT_ACCESS_SECRET": "@JWT_ACCESS_SECRET",
+    "JWT_REFRESH_SECRET": "@JWT_REFRESH_SECRET",
+    "CLIENT_URL": "@CLIENT_URL"
+  }
+}
