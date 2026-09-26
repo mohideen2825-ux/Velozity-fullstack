@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { sendError } from '../utils/response';
 import { verifyAccessToken } from '../utils/jwt';
-import { Role } from '@prisma/client';
+import { Role } from '../types/models';
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     try {

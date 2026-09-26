@@ -28,7 +28,9 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         };
 
         tasksByStatus.forEach((t) => {
-            formattedTasks[t.status] = t._count.status;
+            if (t.status in formattedTasks) {
+                formattedTasks[t.status as keyof typeof formattedTasks] = t._count.status;
+            }
         });
 
         sendSuccess(

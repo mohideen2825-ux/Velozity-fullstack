@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { sendError, sendSuccess } from '../utils/response';
-import { TaskStatus, Priority, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { TaskStatus, Priority } from '../types/models';
 import { getIO } from '../sockets';
 import { handlePrismaError } from '../utils/prismaErrors';
 
