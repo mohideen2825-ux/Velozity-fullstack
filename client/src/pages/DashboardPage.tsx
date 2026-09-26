@@ -5,14 +5,25 @@ import { DashboardStats, TaskActivity } from '../types';
 import Spinner from '../components/ui/Spinner';
 import { format } from 'date-fns';
 import { getSocket } from '../hooks/useSocket';
+import {
+  ProjectsIcon,
+  AlertTriangleIcon,
+  UsersIcon,
+  TasksIcon,
+  ArrowPathIcon,
+  ClockIcon,
+  CheckCircleIcon
+} from '../components/ui/Icons';
 
-const StatCard: React.FC<{ label: string; value: number | string; icon: string; accent?: string }> = ({
-  label, value, icon, accent = 'accent-blue',
+const StatCard: React.FC<{ label: string; value: number | string; icon: React.ReactNode; accent?: string }> = ({
+  label, value, icon, accent = 'accent-indigo',
 }) => (
   <div className={`stat-card ${accent}`}>
-    <div className="stat-icon">{icon}</div>
-    <div className="stat-value">{value}</div>
-    <div className="stat-label">{label}</div>
+    <div className="stat-icon-wrapper">{icon}</div>
+    <div className="stat-content">
+      <div className="stat-value">{value}</div>
+      <div className="stat-label">{label}</div>
+    </div>
   </div>
 );
 
@@ -62,9 +73,13 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Overview</h1>
+        <div>
+          <h1 className="page-title">Executive Dashboard</h1>
+          <p className="page-subtitle">Real-time status across projects, tasks, and team productivity</p>
+        </div>
         <button className="btn btn-ghost btn-sm" onClick={() => { fetchStats(); fetchActivity(); }}>
-          ↻ Refresh
+          <ArrowPathIcon size={14} />
+          <span>Refresh</span>
         </button>
       </div>
 
@@ -73,13 +88,13 @@ const DashboardPage: React.FC = () => {
         <div className="center"><Spinner /></div>
       ) : stats ? (
         <div className="stats-grid">
-          <StatCard label="Total Projects" value={stats.totalProjects} icon="📁" accent="accent-blue" />
-          <StatCard label="Overdue Tasks" value={stats.overdueTasks} icon="⚠️" accent="accent-red" />
-          <StatCard label="Online Users" value={stats.activeOnlineUsers} icon="🟢" accent="accent-green" />
-          <StatCard label="To Do" value={stats.tasksByStatus.TO_DO} icon="📋" accent="accent-neutral" />
-          <StatCard label="In Progress" value={stats.tasksByStatus.IN_PROGRESS} icon="🔄" accent="accent-blue" />
-          <StatCard label="In Review" value={stats.tasksByStatus.IN_REVIEW} icon="🔍" accent="accent-yellow" />
-          <StatCard label="Done" value={stats.tasksByStatus.DONE} icon="✅" accent="accent-green" />
+          <StatCard label="Total Projects" value={stats.totalProjects} icon={<ProjectsIcon size={20} />} accent="accent-indigo" />
+          <StatCard label="Overdue Tasks" value={stats.overdueTasks} icon={<AlertTriangleIcon size={20} />} accent="accent-red" />
+          <StatCard label="Online Users" value={stats.activeOnlineUsers} icon={<UsersIcon size={20} />} accent="accent-emerald" />
+          <StatCard label="To Do" value={stats.tasksByStatus.TO_DO} icon={<TasksIcon size={20} />} accent="accent-neutral" />
+          <StatCard label="In Progress" value={stats.tasksByStatus.IN_PROGRESS} icon={<ArrowPathIcon size={20} />} accent="accent-blue" />
+          <StatCard label="In Review" value={stats.tasksByStatus.IN_REVIEW} icon={<ClockIcon size={20} />} accent="accent-amber" />
+          <StatCard label="Completed" value={stats.tasksByStatus.DONE} icon={<CheckCircleIcon size={20} />} accent="accent-green" />
         </div>
       ) : (
         <p className="text-muted">Could not load stats.</p>

@@ -5,6 +5,7 @@ import { getNotificationsApi, markAllAsReadApi, markAsReadApi } from '../../api/
 import { getSocket } from '../../hooks/useSocket';
 import { Notification } from '../../types';
 import toast from 'react-hot-toast';
+import { BellIcon, LogoutIcon } from '../ui/Icons';
 
 const Topbar: React.FC = () => {
   const { logout, user } = useAuth();
@@ -71,19 +72,24 @@ const Topbar: React.FC = () => {
 
   return (
     <header className="topbar">
-      <div className="topbar-title">
-        {user?.role === 'ADMIN' ? 'Admin Dashboard' : `Welcome, ${user?.name}`}
+      <div className="topbar-left">
+        <h2 className="topbar-heading">
+          {user?.role === 'ADMIN' ? 'Admin Dashboard' : `Workspace Overview`}
+        </h2>
+        <span className="topbar-user-pill">
+          {user?.name} · <span className="topbar-role-badge">{user?.role?.replace('_', ' ')}</span>
+        </span>
       </div>
 
       <div className="topbar-actions">
         {/* Notification Bell */}
         <div className="notif-wrapper" ref={dropdownRef}>
           <button
-            className="notif-btn"
+            className={`notif-btn ${unreadCount > 0 ? 'has-unread' : ''}`}
             onClick={() => setShowDropdown((v) => !v)}
             aria-label={`Notifications, ${unreadCount} unread`}
           >
-            🔔
+            <BellIcon size={19} />
             {unreadCount > 0 && (
               <span className="notif-badge" aria-label={`${unreadCount} unread`}>
                 {unreadCount > 99 ? '99+' : unreadCount}
@@ -94,16 +100,16 @@ const Topbar: React.FC = () => {
           {showDropdown && (
             <div className="notif-dropdown" role="menu">
               <div className="notif-dropdown-header">
-                <span>Notifications</span>
+                <span className="notif-title">Notifications</span>
                 {unreadCount > 0 && (
                   <button className="notif-mark-all" onClick={handleMarkAll}>
-                    Mark all read
+                    Mark all as read
                   </button>
                 )}
               </div>
               <ul className="notif-list">
                 {notifications.length === 0 && (
-                  <li className="notif-empty">No notifications</li>
+                  <li className="notif-empty">No notifications yet</li>
                 )}
                 {notifications.map((n) => (
                   <li
@@ -121,8 +127,9 @@ const Topbar: React.FC = () => {
         </div>
 
         {/* Logout */}
-        <button className="btn btn-ghost" onClick={handleLogout}>
-          Logout
+        <button className="btn btn-ghost btn-logout" onClick={handleLogout} title="Sign Out">
+          <LogoutIcon size={16} />
+          <span>Sign Out</span>
         </button>
       </div>
     </header>
