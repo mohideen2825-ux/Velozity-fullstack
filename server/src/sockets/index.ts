@@ -9,7 +9,19 @@ export const initSocket = (server: HttpServer) => {
     const clientUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.replace(/\/$/, '') : 'http://localhost:5173';
     io = new SocketIOServer(server, {
         cors: {
-            origin: [clientUrl, 'http://localhost:5173'],
+            origin: (origin, callback) => {
+                if (!origin) return callback(null, true);
+                const originClean = origin.replace(/\/$/, '');
+                if (
+                    originClean === clientUrl ||
+                    originClean === 'http://localhost:5173' ||
+                    originClean.endsWith('.vercel.app') ||
+                    process.env.NODE_ENV !== 'production'
+                ) {
+                    return callback(null, true);
+                }
+                return callback(new Error(`CORS error: Origin ${origin} not allowed`));
+            },
             credentials: true,
         },
     });

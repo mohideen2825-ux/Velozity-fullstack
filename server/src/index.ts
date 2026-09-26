@@ -23,7 +23,12 @@ app.use(cors({
         // Allow requests with no origin (e.g. mobile apps, Postman, server-to-server)
         if (!origin) return callback(null, true);
         const originClean = origin.replace(/\/$/, '');
-        if (originClean === clientUrl || originClean === 'http://localhost:5173' || process.env.NODE_ENV !== 'production') {
+        if (
+            originClean === clientUrl ||
+            originClean === 'http://localhost:5173' ||
+            originClean.endsWith('.vercel.app') ||
+            process.env.NODE_ENV !== 'production'
+        ) {
             return callback(null, true);
         }
         return callback(new Error(`CORS error: Origin ${origin} not allowed`));
