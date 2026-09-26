@@ -1,11 +1,8 @@
 node_modules
+dist
 .env
-.env.example
+.env.local
 *.log
 .git
 .gitignore
 .DS_Store
-src
-tsconfig.json
-vite.config.ts
-index.html

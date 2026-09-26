@@ -54,10 +54,15 @@ export const login = async (req: Request, res: Response) => {
             },
         });
 
-        res.cookie('refreshToken', refreshToken, {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: isProduction,
+            sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+        };
+
+        res.cookie('refreshToken', refreshToken, {
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
@@ -70,13 +75,20 @@ export const login = async (req: Request, res: Response) => {
 
 export const refresh = async (req: Request, res: Response) => {
     try {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+        };
+
         const { refreshToken } = req.cookies;
         if (!refreshToken) return sendError(res, 401, 'No refresh token provided');
 
         const storedToken = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
         if (!storedToken || storedToken.expiresAt < new Date()) {
             if (storedToken) await prisma.refreshToken.delete({ where: { id: storedToken.id } });
-            res.clearCookie('refreshToken');
+            res.clearCookie('refreshToken', cookieOptions);
             return sendError(res, 401, 'Refresh token invalid or expired');
         }
 
@@ -85,7 +97,7 @@ export const refresh = async (req: Request, res: Response) => {
             decoded = verifyRefreshToken(refreshToken);
         } catch {
             await prisma.refreshToken.delete({ where: { id: storedToken.id } });
-            res.clearCookie('refreshToken');
+            res.clearCookie('refreshToken', cookieOptions);
             return sendError(res, 401, 'Refresh token invalid or expired');
         }
 
@@ -102,11 +114,18 @@ export const refresh = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
     try {
+        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+        };
+
         const { refreshToken } = req.cookies;
         if (refreshToken) {
             await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
         }
-        res.clearCookie('refreshToken');
+        res.clearCookie('refreshToken', cookieOptions);
         sendSuccess(res, 200, null, 'Logged out successfully');
     } catch (error) {
         sendError(res, 500, 'Internal server error');

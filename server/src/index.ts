@@ -10,12 +10,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for Render / Cloudflare reverse proxies (enables proper rate limiting & secure cookies)
+app.set('trust proxy', 1);
+
 // ── Request logging ───────────────────────────────────────────────────────────
 app.use(morgan('dev'));
 
 // ── Core middleware ───────────────────────────────────────────────────────────
+const clientUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.replace(/\/$/, '') : 'http://localhost:5173';
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, Postman, server-to-server)
+        if (!origin) return callback(null, true);
+        const originClean = origin.replace(/\/$/, '');
+        if (originClean === clientUrl || originClean === 'http://localhost:5173' || process.env.NODE_ENV !== 'production') {
+            return callback(null, true);
+        }
+        return callback(new Error(`CORS error: Origin ${origin} not allowed`));
+    },
     credentials: true,
 }));
 app.use(express.json());
